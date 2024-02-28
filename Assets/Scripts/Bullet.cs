@@ -1,24 +1,60 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] float bulletSpeed = 5;
-    // Start is called before the first frame update
+    public float speed = 10f; 
+
+    private void Update()
+    {
+        MoveBullet();
+    }
+
+    void MoveBullet()
+    {
+        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+    }
+
+    void OnBecameInvisible()
+    {
+        gameObject.SetActive(false); 
+    }
+
+    public void ActivateBullet(Vector3 position, Quaternion rotation)
+    {
+        transform.position = position; 
+        transform.rotation = rotation;
+        gameObject.SetActive(true); 
+    }
+}
+
+public class BulletPool : MonoBehaviour
+{
+    public GameObject bulletPrefab; 
+    public int poolSize = 10; 
+    private List<GameObject> bulletPool; 
+
     void Start()
     {
-        
+        bulletPool = new List<GameObject>();
+
+        for (int i = 0; i < poolSize; i++)
+        {
+            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+            bullet.SetActive(false);
+            bulletPool.Add(bullet);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public GameObject GetBullet()
     {
-        transform.position += transform.forward * bulletSpeed * Time.deltaTime;
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        gameObject.SetActive(false);
+        foreach (GameObject bullet in bulletPool)
+        {
+            if (!bullet.activeInHierarchy)
+            {
+                return bullet;
+            }
+        }
+        return null;
     }
 }

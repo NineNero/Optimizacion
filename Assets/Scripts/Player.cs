@@ -1,33 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] Transform gunPosition;
-    [SerializeField] int bulletType = 0;
+    public float speed = 5f; 
+    public GameObject bulletPrefab; 
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        if(Input.GetButtonDown("Fire1"))
-        {
-            GameObject bullet = PoolManager.Instance.GetPooledObjects(bulletType, gunPosition.position, gunPosition.rotation);
+        float horizontalInput = Input.GetAxis("Horizontal");
+        transform.Translate(Vector3.right * horizontalInput * speed * Time.deltaTime);
 
-            if(bullet != null)
-            {
-                bullet.SetActive(true);
-            }
-            else
-            {
-                Debug.LogError("Pool demasiado pequeño");
-            }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Shoot();
         }
+    }
+
+    void Shoot()
+    {
+        Instantiate(bulletPrefab, transform.position, Quaternion.identity);
     }
 }
